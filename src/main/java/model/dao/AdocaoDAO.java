@@ -9,5 +9,5 @@ package model.dao;
  * @author nicol
  */
 public class AdocaoDAO {
-    
+    //CREATE - Registrar uma nova adocao no banco de dados
 }

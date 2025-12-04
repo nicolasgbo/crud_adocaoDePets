@@ -4,6 +4,10 @@
  */
 package views;
 
+import javax.swing.JOptionPane;
+import model.bean.Usuario;
+import model.dao.UsuarioDAO;
+
 /**
  *
  * @author nicol
@@ -117,6 +121,33 @@ public class Login extends javax.swing.JFrame {
 
     private void BtnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEntrarActionPerformed
         // TODO add your handling code here:
+        //Pegando os valores dos campos
+        String email = txtEmail.getText();
+        String senha = new String(txtSenha.getPassword());
+        
+        //Validando se os campos estao vazios
+        if (email.isEmpty() || senha.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos!");
+            return;
+        }
+        
+        //Buscando os dados no banco de dados
+        UsuarioDAO dao = new UsuarioDAO();
+        Usuario usuario = dao.read(email, senha);
+        
+        //Verificando se foi encontrado o usuario no BD
+        if (usuario != null) {
+            //Dando certo o usuario e logado e recebe uma boas vindas
+            JOptionPane.showMessageDialog(this, "Bem-vindo, " + usuario.getNomeUsuario() + "!");
+            
+            // Abre a tela principal passando o usuário logado
+            TelaPrincipal tela = new TelaPrincipal(usuario);
+            tela.setVisible(true);
+            this.dispose(); // Fecha a tela de login
+        } else {
+            //Com informacoes incorretas, usuario e notificado
+            JOptionPane.showMessageDialog(this, "Email ou senha incorretos!");
+        }
     }//GEN-LAST:event_BtnEntrarActionPerformed
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed

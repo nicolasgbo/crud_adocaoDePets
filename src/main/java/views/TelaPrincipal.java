@@ -4,17 +4,42 @@
  */
 package views;
 
+import model.bean.Usuario;
+
 /**
  *
  * @author nicol
  */
 public class TelaPrincipal extends javax.swing.JFrame {
-
+    //Criando a variavel de usuario logado
+    private Usuario usuarioLogado;
+    
     /**
      * Creates new form TelaPrincipal
      */
     public TelaPrincipal() {
         initComponents();
+    }
+    
+    //Iniciando um metodo construtor
+    public TelaPrincipal(Usuario usuario) {
+        initComponents();
+        this.usuarioLogado = usuario;
+        
+        // Opcional: mostrar info do usuário
+        this.setTitle("Sistema de Adoção - Olá, " + usuario.getNomeUsuario());
+        
+        // Diferenciar por tipo
+        if ("doador".equals(usuario.getTipoUsuario())) {
+            System.out. println("Usuário logado como DOADOR");
+        } else if ("adotante".equals(usuario.getTipoUsuario())) {
+            System.out.println("Usuário logado como ADOTANTE");
+        }
+    }
+    
+    // Método para acessar o usuário em outras partes
+    public Usuario getUsuarioLogado() {
+        return usuarioLogado;
     }
 
     /**
@@ -129,10 +154,24 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        /* Configura o look and feel Nimbus (opcional) */
+        try {
+            for (javax.swing.UIManager. LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing. UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level. SEVERE, null, ex);
+        }
+
+        /* Cria e exibe a tela de Login */
+        java.awt.EventQueue. invokeLater(new Runnable() {
             public void run() {
-                new TelaPrincipal().setVisible(true);
+                Login telaLogin = new Login();
+                telaLogin.setVisible(true);
+                telaLogin. setLocationRelativeTo(null); // Centraliza na tela
             }
         });
     }
