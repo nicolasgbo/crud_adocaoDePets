@@ -4,19 +4,56 @@
  */
 package views;
 
+import java.awt.List;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import model.bean.Especie;
+import model.bean.Pet;
+import model.bean.Usuario;
+import model.dao.EspecieDAO;
+import model.dao.PetDAO;
+
 /**
  *
  * @author nicol
  */
 public class CadastroPet extends javax.swing.JInternalFrame {
-
+    //Variavel para manter o usuario logado
+    private Usuario usuarioLogado;
+    
     /**
      * Creates new form CadastroPet
      */
+    
     public CadastroPet() {
         initComponents();
     }
+    
+    //Metodo construtor recebendo o usuario logado
+    public CadastroPet(Usuario usuario) {
+        initComponents();
+        this.usuarioLogado = usuario; 
+        
+        //Carregando as especies para usar no combobox
+        carregarEspecies();
+    }
+    
+    private void carregarEspecies() {
+        //Limpando quaisquer items que tiver no ComboBox
+        cbEspeciePet.removeAllItems();
 
+        //Buscando as especies disponiveis no Banco de dados usando o EspecieDAO
+        EspecieDAO dao = new EspecieDAO();  // ← MUDANÇA AQUI
+        ArrayList<Especie> especies = dao.listarEspecies();
+
+        // Adiciona as espécies no ComboBox
+        for (Especie especie : especies) {
+            cbEspeciePet.addItem(especie);
+        }
+    }
+
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -61,8 +98,6 @@ public class CadastroPet extends javax.swing.JInternalFrame {
         cbStatusPet.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "disponivel", "adotado" }));
 
         jlEspeciePet.setText("Espécie");
-
-        cbEspeciePet.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         btnCadastrarPet.setText("Cadastrar");
         btnCadastrarPet.addActionListener(new java.awt.event.ActionListener() {
@@ -139,12 +174,76 @@ public class CadastroPet extends javax.swing.JInternalFrame {
 
     private void btnCadastrarPetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarPetActionPerformed
         // TODO add your handling code here:
+        //Recebendo os valores 
+        String nome = txtNomePet.getText();
+        String idadeTexto = txtIdadePet. getText(); //Definindo idade texto, pois depois faremos a validacao se o usuario enviou um numero
+        String status = cbStatusPet.getSelectedItem().toString();
+        
+        //Validando se o usuario deixou campos em vazio
+        if (nome.isEmpty() || idadeTexto.isEmpty()) {
+            //Se tiver em branco vai lancar uma msg
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos!");
+            return;
+        }
+        
+        //Validando se o usuario selecionou uma especie
+        if (cbEspeciePet. getSelectedItem() == null) {
+            //Se tiver em branco vai lancar uma msg
+            JOptionPane.showMessageDialog(this, "Selecione uma espécie!");
+            return;
+        }
+        
+        //Pegando o valor da especie selecionada
+        Especie especieSelecionada = (Especie) cbEspeciePet.getSelectedItem();
+        
+        //Validando se o usuario inseriu um numero no campo de idade
+        int idade;
+        try {
+            idade = Integer.parseInt(idadeTexto);
+            if (idade < 0) {
+                //Impedindo com o que o usuario esteja inserindo um numero valido
+                JOptionPane.showMessageDialog(this, "A idade deve ser um número positivo!");
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            //Se o usuario tentar inserir caracteres diferente de numero vai dar erro.
+            JOptionPane.showMessageDialog(this, "A idade deve ser um número válido!");
+            return;
+        }
+        
+        //Criando o objeto pet e armazenando os valores recebidos pelo usuario
+        Pet pet = new Pet();
+        pet.setNomePet(nome);
+        pet. setIdadePet(idade);
+        pet.setStatusPet(status);
+        pet.setIdUsuarioDono(usuarioLogado.getIdUsuario()); //ID do usuarioLogado
+        pet.setIdEspecie(especieSelecionada.getIdEspecie()); //ID da especie selecionada
+        
+        //Pegando os valores armazenados e guardando no banco de dados utilizando o PetDAO
+        PetDAO dao = new PetDAO();
+        
+        if (dao.create(pet)) {
+            //Caso de certo ele vai cadastrar
+            JOptionPane.showMessageDialog(this, "Pet cadastrado com sucesso!");
+            
+            //Depois da insercao ele vai limpar os campos
+            txtNomePet.setText("");
+            txtIdadePet.setText("");
+            cbStatusPet.setSelectedIndex(0);
+            if (cbEspeciePet.getItemCount() > 0) {
+                cbEspeciePet. setSelectedIndex(0);
+            }
+            
+        } else {
+            //Se tiver erro, ele vai lancar erro
+            JOptionPane.showMessageDialog(this, "Erro ao cadastrar pet!");
+        }
     }//GEN-LAST:event_btnCadastrarPetActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCadastrarPet;
-    private javax.swing.JComboBox<String> cbEspeciePet;
+    private javax.swing.JComboBox<Especie> cbEspeciePet;
     private javax.swing.JComboBox<String> cbStatusPet;
     private javax.swing.JLabel jlEspeciePet;
     private javax.swing.JLabel jlIdadePet;

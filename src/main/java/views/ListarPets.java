@@ -4,19 +4,73 @@
  */
 package views;
 
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+import model.bean.Pet;
+import model.bean.Usuario;
+import model.dao.PetDAO;
+
 /**
  *
  * @author nicol
  */
 public class ListarPets extends javax.swing.JInternalFrame {
-
+    //Variavel para manter o usuario logado
+    private Usuario usuarioLogado;
+    
     /**
      * Creates new form ListarPets
      */
     public ListarPets() {
         initComponents();
     }
-
+    
+    //Iniciando um construtor recebendo o usuario logado
+    public ListarPets(Usuario usuario) {
+        initComponents();
+        this.usuarioLogado = usuario;
+        
+        //Carregando os pets disponiveis na tabela
+        carregarPets();
+    }
+    
+    //Criando um metodo para carregar os pets na tela
+    private void carregarPets() {
+        //Buscando os pets no banco de dados
+        PetDAO dao = new PetDAO();
+        ArrayList<Pet> pets = dao.listarPets();
+        
+        //Configurando o modelo da tabela
+        DefaultTableModel modelo = (DefaultTableModel) tableListarPets.getModel();
+        modelo.setRowCount(0); //Limpando a tabela
+        
+        //Incluindo os pets dinamicamente na tabela
+        for (Pet pet : pets) {
+            modelo. addRow(new Object[]{
+                pet.getIdPet(),
+                pet.getNomePet(),
+                pet.getIdadePet() + " anos",
+                obterNomeEspecie(pet.getIdEspecie()),
+                pet.getStatusPet()
+            });
+        }
+    }
+    
+    //Metodo auxiliar criado para buscar o nome da especie
+    private String obterNomeEspecie(int idEspecie) {
+        // Você pode melhorar isso buscando direto do banco
+        // Por enquanto, vamos retornar o ID
+        PetDAO dao = new PetDAO();
+        ArrayList<model.bean.Especie> especies = dao.listarEspecies();
+        
+        for (model.bean.Especie especie : especies) {
+            if (especie.getIdEspecie() == idEspecie) {
+                return especie.getNomeEspecie();
+            }
+        }
+        
+     
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -91,6 +145,7 @@ public class ListarPets extends javax.swing.JInternalFrame {
 
     private void btnSolicitarAdocaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolicitarAdocaoActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnSolicitarAdocaoActionPerformed
 
 

@@ -67,16 +67,21 @@ public class TelaPrincipal extends javax.swing.JFrame {
         painelPrincipal.setLayout(painelPrincipalLayout);
         painelPrincipalLayout.setHorizontalGroup(
             painelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 701, Short.MAX_VALUE)
+            .addGap(0, 913, Short.MAX_VALUE)
         );
         painelPrincipalLayout.setVerticalGroup(
             painelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 415, Short.MAX_VALUE)
+            .addGap(0, 512, Short.MAX_VALUE)
         );
 
         MenuPets.setText("Pets");
 
         miCadastrarPet.setText("Cadastrar Pet");
+        miCadastrarPet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miCadastrarPetActionPerformed(evt);
+            }
+        });
         MenuPets.add(miCadastrarPet);
 
         jMenuItem2.setText("Gerenciar Solicitações");
@@ -99,6 +104,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
         MenuPerfil.setText("Perfil");
 
         miSair.setText("Sair ");
+        miSair.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miSairActionPerformed(evt);
+            }
+        });
         MenuPerfil.add(miSair);
 
         jMenuBar1.add(MenuPerfil);
@@ -126,6 +136,37 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private void miSolicitacaoAdocaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSolicitacaoAdocaoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_miSolicitacaoAdocaoActionPerformed
+
+    private void miSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSairActionPerformed
+        // TODO add your handling code here:
+        //Confirmando se o usuario deseja sair
+        int resposta = javax.swing.JOptionPane.showConfirmDialog(
+            this,
+            "Deseja realmente sair?",
+            "Confirmar Saída",
+            javax.swing. JOptionPane.YES_NO_OPTION, //Oferecendo as opcoes de YES ou NO para o usuario
+            javax.swing.JOptionPane. QUESTION_MESSAGE
+        );
+        
+        //Se o usuario escolher a opcao YES
+        if (resposta == javax.swing.JOptionPane.YES_OPTION) {
+            //Vai abrir a tela de login
+            Login telaLogin = new Login();
+            telaLogin.setVisible(true);
+            telaLogin.setLocationRelativeTo(null); //Centralizando o conteudo na tela
+
+            //Fechando a tela princpal
+            this.dispose();
+        }
+    }//GEN-LAST:event_miSairActionPerformed
+
+    private void miCadastrarPetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCadastrarPetActionPerformed
+        // TODO add your handling code here:
+        //Criando a tela de cadastro de pets para o usuario logado
+        CadastroPet telaCadastroPet = new CadastroPet(usuarioLogado);
+        painelPrincipal.add(telaCadastroPet);
+        telaCadastroPet.setVisible(true);
+    }//GEN-LAST:event_miCadastrarPetActionPerformed
 
     /**
      * @param args the command line arguments

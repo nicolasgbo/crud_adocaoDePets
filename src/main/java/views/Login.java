@@ -152,6 +152,13 @@ public class Login extends javax.swing.JFrame {
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
         // TODO add your handling code here:
+        // Abre a tela de cadastro
+        CadastroUsuario telaCadastro = new CadastroUsuario();
+        telaCadastro.setVisible(true);
+        telaCadastro.setLocationRelativeTo(null); // Centraliza na tela
+
+        // Fecha a tela de login (opcional)
+        this.dispose();
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
     /**

@@ -42,7 +42,6 @@
                   <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="jlTipo" min="-2" pref="37" max="-2" attributes="0"/>
-                      <Component id="txtSenha" max="32767" attributes="0"/>
                       <Component id="jlSenha" min="-2" pref="37" max="-2" attributes="0"/>
                       <Component id="txtEmail" max="32767" attributes="0"/>
                       <Component id="jlEmail" min="-2" pref="37" max="-2" attributes="0"/>
@@ -50,6 +49,7 @@
                       <Component id="jlNome" alignment="0" min="-2" pref="37" max="-2" attributes="0"/>
                       <Component id="cbTipo" alignment="0" pref="400" max="32767" attributes="0"/>
                       <Component id="btnCadastrar" max="32767" attributes="0"/>
+                      <Component id="txtSenha" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace pref="30" max="32767" attributes="0"/>
               </Group>
@@ -106,11 +106,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtEmail">
         </Component>
-        <Component class="javax.swing.JTextField" name="txtSenha">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jTextField1"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JComboBox" name="cbTipo">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
@@ -131,6 +126,8 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCadastrarActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JPasswordField" name="txtSenha">
         </Component>
       </SubComponents>
     </Container>

@@ -18,6 +18,39 @@
 
     public class UsuarioDAO {
         //CREATE - Usando CREATE para criar um novo usuario no banco de dados
+        public boolean create(Usuario usuario){
+            Connection con = Conexao.getConexao();
+            PreparedStatement stmt = null;
+            
+            try {
+                //Criando uma query para inserir um novo usuario no banco de dados
+                String sql = "INSERT INTO Usuario (nome, email, senha, tipo) VALUES (?, ?, ?, ?)";
+                stmt = con.prepareStatement(sql);
+                
+                //Substituindo os valores de ? para os valores inseridos pelo usuario
+                // Substituindo os ? pelos valores do objeto Usuario
+                stmt.setString(1, usuario.getNomeUsuario());
+                stmt.setString(2, usuario.getEmailUsuario());
+                stmt.setString(3, usuario.getSenhaUsuario());
+                stmt.setString(4, usuario.getTipoUsuario());
+                
+                //Executando a query
+                stmt.executeUpdate();
+                
+                //Retornando true se o cadastro foi completo
+                return true;
+            } catch (SQLException ex) {
+                //Se der erro, ele vai lancar o erro
+                System. err.println("Erro ao cadastrar usuário: " + ex);
+                ex.printStackTrace();
+                
+                //Retornado false se o cadastro der errado
+                return false; 
+            } finally {
+                //Independente de tudo, ele vai fechar a conexao depois de tudo
+                Conexao.fecharConexao(con, stmt);
+            }
+        }
 
         //READ -  Para buscar Email/Senha para fazer o login do usuario
         public Usuario read(String email, String senha){

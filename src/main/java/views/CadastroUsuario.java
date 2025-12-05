@@ -4,6 +4,10 @@
  */
 package views;
 
+import javax.swing.JOptionPane;
+import model.bean.Usuario;
+import model.dao.UsuarioDAO;
+
 /**
  *
  * @author nicol
@@ -33,9 +37,9 @@ public class CadastroUsuario extends javax.swing.JFrame {
         jlTipo = new javax.swing.JLabel();
         txtNome = new javax.swing.JTextField();
         txtEmail = new javax.swing.JTextField();
-        txtSenha = new javax.swing.JTextField();
         cbTipo = new javax.swing.JComboBox<>();
         btnCadastrar = new javax.swing.JButton();
+        txtSenha = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -46,8 +50,6 @@ public class CadastroUsuario extends javax.swing.JFrame {
         jlSenha.setText("Senha");
 
         jlTipo.setText("Tipo");
-
-        txtSenha.setText("jTextField1");
 
         cbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "adotante", "doador" }));
 
@@ -66,14 +68,14 @@ public class CadastroUsuario extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addGroup(jpCadastroUsuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jlTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtSenha)
                     .addComponent(jlSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtEmail)
                     .addComponent(jlEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtNome)
                     .addComponent(jlNome, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbTipo, 0, 400, Short.MAX_VALUE)
-                    .addComponent(btnCadastrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnCadastrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtSenha))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
         jpCadastroUsuarioLayout.setVerticalGroup(
@@ -116,6 +118,45 @@ public class CadastroUsuario extends javax.swing.JFrame {
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
         // TODO add your handling code here:
+        //Pegando os valores inseridos pelo usuario
+        String nome = txtNome.getText();
+        String email = txtEmail. getText();
+        String senha = new String(txtSenha.getPassword());
+        String tipo = cbTipo.getSelectedItem().toString();
+        
+        //Validando se nao tem nenhum campo vazio
+        if (nome. isEmpty() || email.isEmpty() || senha.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos!");
+        return;
+        }
+        
+        //Criando um objeto usuario e guardando os dados recebidos pelo usuario
+        Usuario usuario = new Usuario();
+        usuario.setNomeUsuario(nome);
+        usuario. setEmailUsuario(email);
+        usuario.setSenhaUsuario(senha);
+        usuario.setTipoUsuario(tipo);
+        
+        //Pegamos os valores armazenados, e passamos para o DAO para fazer a inclusao desses dados no banco de dados
+        UsuarioDAO dao = new UsuarioDAO();
+        if (dao.create(usuario)) {
+            JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!");
+
+            //Limpando os campos apos o registro
+            txtNome.setText("");
+            txtEmail. setText("");
+            txtSenha.setText("");
+            cbTipo.setSelectedIndex(0);
+
+            //Voltando para tela de login e fechando a tela de cadastro
+            Login telaLogin = new Login();
+            telaLogin.setVisible(true);
+            telaLogin. setLocationRelativeTo(null);
+            this.dispose();
+        } else {
+            //Caso der erro, vai lancar erro
+            JOptionPane.showMessageDialog(this, "Erro ao cadastrar usuário!");
+        }
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
     /**
@@ -163,6 +204,6 @@ public class CadastroUsuario extends javax.swing.JFrame {
     private javax.swing.JPanel jpCadastroUsuario;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtNome;
-    private javax.swing.JTextField txtSenha;
+    private javax.swing.JPasswordField txtSenha;
     // End of variables declaration//GEN-END:variables
 }
