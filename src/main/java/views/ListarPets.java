@@ -4,16 +4,17 @@
  */
 package views;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.bean.Especie;
+import model.bean.Interesse;
 import model.bean.Pet;
 import model.bean.Usuario;
 import model.dao.EspecieDAO;
 import model.dao.InteresseDAO;
 import model.dao.PetDAO;
-import model.bean.Interesse;
 
 /**
  *
@@ -34,6 +35,12 @@ public class ListarPets extends javax.swing.JInternalFrame {
     public ListarPets(Usuario usuario) {
         initComponents();
         this.usuarioLogado = usuario;
+        
+        //Se o usuario for doador, o botao de solicitar adocao vai ser desabilitado
+        if (usuarioLogado.getTipoUsuario().equalsIgnoreCase("doador")) {
+            btnSolicitarAdocao.setEnabled(false);
+            btnSolicitarAdocao.setVisible(false);
+        }
         
         //Carregando os pets disponiveis na tabela
         carregarPets();
@@ -170,7 +177,7 @@ public class ListarPets extends javax.swing.JInternalFrame {
         
         //Confirmando se o usuario ja informou interesse(solicitou adocao) nesse pet
         InteresseDAO interesseDAO = new InteresseDAO();
-        if (interesseDAO.verificarInteresseExistente(usuarioLogado.getIdUsuario(), idPet)) {
+        if (interesseDAO.verificarInteresseExistente(idPet, usuarioLogado.getIdUsuario())) {
             JOptionPane.showMessageDialog(this,
                 "Você já solicitou adoção em " + nomePet + "!",
                 "Aviso",
@@ -186,28 +193,37 @@ public class ListarPets extends javax.swing.JInternalFrame {
         
         //Se ele confirmar essa solicitacao
         if (confirmacao == JOptionPane.YES_OPTION) {
-                //Cria o objeto interesse com os dados do usuario e do pet
-                Interesse interesse = new Interesse(usuarioLogado.getIdUsuario(), idPet);
-                //Registrando o interesse (solicitacao) no banco de dados
-            if (interesseDAO. registrarInteresse(interesse)) {
-                //Se der certo, mostra mensagem de sucesso
-                JOptionPane.showMessageDialog(this,
-                    "Interesse em " + nomePet + " registrado com sucesso!\n" +
-                    "O doador será notificado e entrará em contato.",
-                    "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
+            try {
+                //Cria um objeto interesse com os dados do usuario e do pet
+                Interesse interesse = new Interesse();
+                interesse.setIdPet(idPet);
+                interesse.setIdUsuario(usuarioLogado.getIdUsuario());
                 
-                //Recarregando a lista de pets
-                carregarPets();
-            } else {
-                //Se der erro, mostra mensagem de erro
+                //Registrando o interesse(solicitacao) no banco de dados
+                if(interesseDAO.registrarInteresse(interesse)) {
+                    //Se der certo, vai mostrar mensagem de sucesso
+                    JOptionPane.showMessageDialog(this,
+                        "Interesse em " + nomePet + " registrado com sucesso!\n" +
+                        "O doador será notificado e entrará em contato.",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    //Recarregando a lista de pets
+                    carregarPets();
+                } else {
+                    //Se der erro, mostra mensagem de erro
+                    JOptionPane.showMessageDialog(this,
+                        "Erro ao registrar interesse.  Tente novamente.",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this,
-                    "Erro ao registrar interesse.  Tente novamente.",
+                    "Erro ao registrar interesse: " + ex. getMessage(),
                     "Erro",
-                    JOptionPane.ERROR_MESSAGE);
+                    JOptionPane. ERROR_MESSAGE);
             }
         }
-        
     }//GEN-LAST:event_btnSolicitarAdocaoActionPerformed
 
 

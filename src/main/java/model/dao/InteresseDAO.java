@@ -95,10 +95,10 @@ public class InteresseDAO {
         
         try {
             //Criando a query para deletar o interesse do banco de dados
-            String sql = "DELETE * FROM Interesse WHERE idPet = ? AND idUsuario = ?";
+            String sql = "DELETE FROM Interesse WHERE idPet = ? AND idUsuario = ?";
             stmt = con.prepareStatement(sql);
-            stmt.setInt(1, idUsuario);
-            stmt.setInt(2, idPet);
+            stmt.setInt(1, idPet);
+            stmt.setInt(2, idUsuario);
             
             //Executando a query DELETE criada
             stmt.executeUpdate();

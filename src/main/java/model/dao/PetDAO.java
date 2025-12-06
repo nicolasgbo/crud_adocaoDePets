@@ -5,7 +5,6 @@
 package model.dao;
 
 import conexao.Conexao;
-import java.awt.List;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
