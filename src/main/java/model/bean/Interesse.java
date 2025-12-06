@@ -20,6 +20,12 @@ public class Interesse {
     private Usuario usuario;
     private Pet pet;
     
+    //Construtor com parâmetros (ADICIONE ESTE)
+    public Interesse(int idUsuario, int idPet) {
+        this.idUsuario = idUsuario;
+        this.idPet = idPet;
+    }
+    
     //Metodos de encapsulamento getters e setters
     public int getIdUsuario() {
         return idUsuario;

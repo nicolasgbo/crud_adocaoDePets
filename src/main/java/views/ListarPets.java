@@ -11,7 +11,9 @@ import model.bean.Especie;
 import model.bean.Pet;
 import model.bean.Usuario;
 import model.dao.EspecieDAO;
+import model.dao.InteresseDAO;
 import model.dao.PetDAO;
+import model.bean.Interesse;
 
 /**
  *
@@ -162,10 +164,20 @@ public class ListarPets extends javax.swing.JInternalFrame {
             return;
         }
         
-        //Recebendo o id do pet selecionado
+        //Pegando o id do pet selecionado pelo usuario
         int idPet = (int) tableListarPets.getValueAt(linhaSelecionada, 0);
         String nomePet = (String) tableListarPets.getValueAt(linhaSelecionada, 1);
         
+        //Confirmando se o usuario ja informou interesse(solicitou adocao) nesse pet
+        InteresseDAO interesseDAO = new InteresseDAO();
+        if (interesseDAO.verificarInteresseExistente(usuarioLogado.getIdUsuario(), idPet)) {
+            JOptionPane.showMessageDialog(this,
+                "Você já solicitou adoção em " + nomePet + "!",
+                "Aviso",
+                JOptionPane. WARNING_MESSAGE);
+            return;
+        }
+                
         //Confirmando se o usuario realmente deseja solicitar uma adocao
         int confirmacao = JOptionPane.showConfirmDialog(this,
             "Deseja solicitar a adoção de " + nomePet + "? ",
@@ -174,17 +186,28 @@ public class ListarPets extends javax.swing.JInternalFrame {
         
         //Se ele confirmar essa solicitacao
         if (confirmacao == JOptionPane.YES_OPTION) {
-            // Aqui você pode implementar a lógica de solicitação de adoção
-            // Por exemplo, criar uma tabela de Solicitações no banco de dados
-            JOptionPane.showMessageDialog(this,
-                "Solicitação de adoção de " + nomePet + " realizada com sucesso!\n" +
-                "Aguarde o contato do doador.",
-                "Sucesso",
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            //Depois disso, recarrega a tela de listarPets
-            carregarPets();
+                //Cria o objeto interesse com os dados do usuario e do pet
+                Interesse interesse = new Interesse(usuarioLogado.getIdUsuario(), idPet);
+                //Registrando o interesse (solicitacao) no banco de dados
+            if (interesseDAO. registrarInteresse(interesse)) {
+                //Se der certo, mostra mensagem de sucesso
+                JOptionPane.showMessageDialog(this,
+                    "Interesse em " + nomePet + " registrado com sucesso!\n" +
+                    "O doador será notificado e entrará em contato.",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                //Recarregando a lista de pets
+                carregarPets();
+            } else {
+                //Se der erro, mostra mensagem de erro
+                JOptionPane.showMessageDialog(this,
+                    "Erro ao registrar interesse.  Tente novamente.",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+            }
         }
+        
     }//GEN-LAST:event_btnSolicitarAdocaoActionPerformed
 
 
