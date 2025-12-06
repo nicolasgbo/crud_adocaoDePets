@@ -12,20 +12,20 @@ import java.time.LocalDate;
  */
 public class Interesse {
     //Definindo as variaveis da classe interesse. É a classe de intemediaria de muitos pra muitos
-    private int idUsuario; //FK para Usuario (parte da PK composta)
-    private int idPet; //FK para Pet (parte da PK composta)
+    private int idUsuario; //PK, FK para Usuario (chave primaria composta)
+    private int idPet; //PK, FK para Pet (chave primaria composta)
     private LocalDate dataInteresse;
     
-    //Para facilitar o uso, buscamos o Objeto Completo
+    //Para facilitar o uso, buscamos o objeto completo
     private Usuario usuario;
     private Pet pet;
     
-    //Metodos de encapsulamento
+    //Metodos de encapsulamento getters e setters
     public int getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(int idUsuario) {
+    public void setIdUsuario(int idUsuario) {   
         this.idUsuario = idUsuario;
     }
 

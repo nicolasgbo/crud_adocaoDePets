@@ -5,9 +5,12 @@
 package views;
 
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import model.bean.Especie;
 import model.bean.Pet;
 import model.bean.Usuario;
+import model.dao.EspecieDAO;
 import model.dao.PetDAO;
 
 /**
@@ -58,17 +61,19 @@ public class ListarPets extends javax.swing.JInternalFrame {
     
     //Metodo auxiliar criado para buscar o nome da especie
     private String obterNomeEspecie(int idEspecie) {
-        // Você pode melhorar isso buscando direto do banco
         // Por enquanto, vamos retornar o ID
-        PetDAO dao = new PetDAO();
-        ArrayList<model.bean.Especie> especies = dao.listarEspecies();
+        EspecieDAO dao = new EspecieDAO();
+        ArrayList<Especie> especies = dao.listarEspecies();
         
-        for (model.bean.Especie especie : especies) {
+        for (Especie especie : especies) {
             if (especie.getIdEspecie() == idEspecie) {
                 return especie.getNomeEspecie();
             }
         }
         
+        //Caso de errado, vai retornar uma mensagem
+        return "Espécie desconhecida!";
+    }       
      
     
     /**
@@ -145,7 +150,41 @@ public class ListarPets extends javax.swing.JInternalFrame {
 
     private void btnSolicitarAdocaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolicitarAdocaoActionPerformed
         // TODO add your handling code here:
+        //Verificando se o usuario selecionou alguma linha da tabela
+        int linhaSelecionada = tableListarPets.getSelectedRow();
         
+        //Usando if para verificar se nao tem nenhuma tabela selecionada, se nao tiver vai lancar uma mensagem
+        if (linhaSelecionada == -1) {
+            JOptionPane.showMessageDialog(this, 
+                "Por favor, selecione um pet para solicitar adoção!", 
+                "Atenção", 
+                JOptionPane. WARNING_MESSAGE);
+            return;
+        }
+        
+        //Recebendo o id do pet selecionado
+        int idPet = (int) tableListarPets.getValueAt(linhaSelecionada, 0);
+        String nomePet = (String) tableListarPets.getValueAt(linhaSelecionada, 1);
+        
+        //Confirmando se o usuario realmente deseja solicitar uma adocao
+        int confirmacao = JOptionPane.showConfirmDialog(this,
+            "Deseja solicitar a adoção de " + nomePet + "? ",
+            "Confirmar Adoção",
+            JOptionPane.YES_NO_OPTION);
+        
+        //Se ele confirmar essa solicitacao
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            // Aqui você pode implementar a lógica de solicitação de adoção
+            // Por exemplo, criar uma tabela de Solicitações no banco de dados
+            JOptionPane.showMessageDialog(this,
+                "Solicitação de adoção de " + nomePet + " realizada com sucesso!\n" +
+                "Aguarde o contato do doador.",
+                "Sucesso",
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            //Depois disso, recarrega a tela de listarPets
+            carregarPets();
+        }
     }//GEN-LAST:event_btnSolicitarAdocaoActionPerformed
 
 

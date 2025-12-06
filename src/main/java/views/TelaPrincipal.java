@@ -135,6 +135,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void miSolicitacaoAdocaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSolicitacaoAdocaoActionPerformed
         // TODO add your handling code here:
+        ListarPets telaListarPets = new ListarPets(usuarioLogado);
+        painelPrincipal.add(telaListarPets);
+        telaListarPets.setVisible(true);
     }//GEN-LAST:event_miSolicitacaoAdocaoActionPerformed
 
     private void miSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSairActionPerformed
