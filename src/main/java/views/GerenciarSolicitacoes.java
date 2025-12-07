@@ -37,19 +37,13 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
         carregarTabela(); //Ja preenche a tabela ao abrir
     }
     
-    //Criando metodo auxiliar para carregar os pets do usuario doador no comboboc
+    //Criando um metodo para carregar a tabela
     private void carregarTabela() {
-        //Definindo o modelo de tabela
-        DefaultTableModel modelo = (DefaultTableModel) tablePets.getModel();
+        //Limpando a tabela
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
         modelo.setRowCount(0);
         
-        //DAO para buscar no banco
-        InteresseDAO interesseDAO = new interesseDAO();
-        
-        //Busca todos as solicitacoes vinculadas ao usuario logado
-        ArrayList<Interesse> lista = interesseDAO.listarInteressesPorPet(usuarioLogado.getIdUsuario());
-        
-        //Buscando os pets no banco de dados
+        //DAO para buscar todos os pets no banco 
         PetDAO dao = new PetDAO();
         ArrayList<Pet> pets = dao.listarPets();
         
@@ -60,36 +54,39 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
             }
         }
         
+        //Verificando se realmente tem pets no banco de dados
         if (cbPets.getItemCount() == 0) {
             JOptionPane.showMessageDialog(this,
-                "Você não tem pets cadastrados ainda! ",
+                "Você não tem pets cadastrados ainda!",
                 "Aviso",
                 JOptionPane. INFORMATION_MESSAGE);
         } else {
-            //Carrega as solicitacoes do primeiro pet
+            //Adicionando listener para atualizar quando mudar o pet selecionado
+            cbPets.addActionListener(e -> carregarSolicitacoes());
             carregarSolicitacoes();
         }
     }
 
     //Criando um metodo para carregar as solicitacoes  
     public void carregarSolicitacoes(){
+        //Pega o pet selecionado no combobox
         Pet petSelecionado = (Pet) cbPets.getSelectedItem();
         
         if (petSelecionado == null) {
             return;
         }
         
-        //Buscando as solicitacoes no banco de dados
+        //Buscando as solicitacoes do pet selecionado no banco de dados
         InteresseDAO dao = new InteresseDAO();
         
         try {
             ArrayList<Interesse> interesses = dao.listarInteressesPorPet(petSelecionado.getIdPet());
             
-            //Configurando o modelo da tabela
+            //Limpando a tabela
             DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-            modelo.setRowCount(0); //Limpando a tabela
+            modelo.setRowCount(0);
             
-            //Incluindo as solicitacoes dinamicamente na tabela
+            //Incluindo na tabela solicitacoes dinamicamente na tabela
             for (Interesse interesse : interesses) {
                 modelo.addRow(new Object[]{
                     interesse.getIdUsuario(),
@@ -99,6 +96,7 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
                 });
             }
             
+            //Mostrando mensagem se não tem solicitacoes
             if (interesses.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                     "Não há solicitações para este pet.",
@@ -107,6 +105,7 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
             }
             
         } catch (SQLException ex) {
+            //Caso der algum erro, ele vai lancar erro
             JOptionPane. showMessageDialog(this,
                 "Erro ao carregar solicitações: " + ex.getMessage(),
                 "Erro",
@@ -236,31 +235,24 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
         int idUsuarioAdotante = (int) jTable1.getValueAt(linhaSelecionada, 0);
         Pet petSelecionado = (Pet) cbPets.getSelectedItem();
         
-        try {
-            //Aprovando a adocao usando o AdocaoDAO
-            AdocaoDAO dao = new AdocaoDAO();
+        //Aprovando a adocao usando o AdocaoDAO
+        AdocaoDAO dao = new AdocaoDAO();
             
-            if (dao.aprovarAdocao(petSelecionado.getIdPet(), idUsuarioAdotante)) {
-                //Se der certo, vai mostrar mensagem de sucesso
-                JOptionPane.showMessageDialog(this,
-                    "Adoção aprovada com sucesso!",
-                    "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-                
-                //Recarregando a lista de pets
-                cbPets.removeAllItems();
-                carregarPets();
-            } else {
-                //Se der erro, mostra mensagem de erro
-                JOptionPane.showMessageDialog(this,
-                    "Erro ao aprovar adoção.  Tente novamente.",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (SQLException ex) {
+        if (dao.aprovarAdocao(petSelecionado.getIdPet(), idUsuarioAdotante)) {
+            //Se der certo, vai mostrar mensagem de sucesso
             JOptionPane.showMessageDialog(this,
-                "Erro ao aprovar adoção: " + ex.getMessage(),
+                "Adoção aprovada com sucesso!",
+                "Sucesso",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+                
+            //Recarregando a lista de pets
+            cbPets.removeAllItems();
+            carregarTabela();
+        } else {
+            //Se der erro, mostra mensagem de erro
+            JOptionPane.showMessageDialog(this,
+                "Erro ao aprovar adoção.  Tente novamente.",
                 "Erro",
                 JOptionPane.ERROR_MESSAGE);
         }
@@ -316,4 +308,3 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane tablePets;
     // End of variables declaration//GEN-END:variables
 }
-ç

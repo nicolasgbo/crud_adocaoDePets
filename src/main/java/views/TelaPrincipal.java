@@ -4,6 +4,7 @@
  */
 package views;
 
+import javax.swing.JOptionPane;
 import model.bean.Usuario;
 
 /**
@@ -55,7 +56,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         MenuPets = new javax.swing.JMenu();
         miCadastrarPet = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        miGerenciarSolicitacoes = new javax.swing.JMenuItem();
         MenuAdocao = new javax.swing.JMenu();
         miSolicitacaoAdocao = new javax.swing.JMenuItem();
         MenuPerfil = new javax.swing.JMenu();
@@ -84,8 +85,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         });
         MenuPets.add(miCadastrarPet);
 
-        jMenuItem2.setText("Gerenciar Solicitações");
-        MenuPets.add(jMenuItem2);
+        miGerenciarSolicitacoes.setText("Gerenciar Solicitações");
+        miGerenciarSolicitacoes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miGerenciarSolicitacoesActionPerformed(evt);
+            }
+        });
+        MenuPets.add(miGerenciarSolicitacoes);
 
         jMenuBar1.add(MenuPets);
 
@@ -165,11 +171,39 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void miCadastrarPetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCadastrarPetActionPerformed
         // TODO add your handling code here:
+        
+        //Verificando se o usuario é doador
+        if (!"doador".equalsIgnoreCase(usuarioLogado.getTipoUsuario())) {
+            JOptionPane.showMessageDialog(this,
+                "Apenas usuários doadores têm acesso a esta página!",
+                "Acesso Negado",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
         //Criando a tela de cadastro de pets para o usuario logado
         CadastroPet telaCadastroPet = new CadastroPet(usuarioLogado);
         painelPrincipal.add(telaCadastroPet);
         telaCadastroPet.setVisible(true);
     }//GEN-LAST:event_miCadastrarPetActionPerformed
+
+    private void miGerenciarSolicitacoesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miGerenciarSolicitacoesActionPerformed
+        // TODO add your handling code here:
+        
+        //Verificando se o usuario é doador
+        if (!"doador".equalsIgnoreCase(usuarioLogado.getTipoUsuario())) {
+            JOptionPane.showMessageDialog(this,
+                "Apenas usuários doadores têm acesso a esta página!",
+                "Acesso Negado",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        //Inserindo a tela de gerenciar solicitacoes
+        GerenciarSolicitacoes telaGerenciarSolicitacoes = new GerenciarSolicitacoes(usuarioLogado);
+        painelPrincipal.add(telaGerenciarSolicitacoes);
+        telaGerenciarSolicitacoes.setVisible(true);
+    }//GEN-LAST:event_miGerenciarSolicitacoesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -225,8 +259,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu MenuPerfil;
     private javax.swing.JMenu MenuPets;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem miCadastrarPet;
+    private javax.swing.JMenuItem miGerenciarSolicitacoes;
     private javax.swing.JMenuItem miSair;
     private javax.swing.JMenuItem miSolicitacaoAdocao;
     private javax.swing.JDesktopPane painelPrincipal;
