@@ -4,17 +4,114 @@
  */
 package views;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.bean.Interesse;
+import model.bean.Pet;
+import model.bean.Usuario;
+import model.dao.AdocaoDAO;
+import model.dao.InteresseDAO;
+import model.dao.PetDAO;
+
 /**
  *
  * @author nicol
  */
 public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
-
+    //Variavel para manter o usuario logado
+    private Usuario usuarioLogado;
+    
     /**
      * Creates new form GerenciarSolicitacoes
      */
     public GerenciarSolicitacoes() {
         initComponents();
+    }
+    
+    //Construtor recebendo o usuario logado
+    public GerenciarSolicitacoes(Usuario usuarioLogado) {
+        initComponents();
+        this.usuarioLogado = usuarioLogado; //Salvando o usuario que esta usando a tela
+        carregarTabela(); //Ja preenche a tabela ao abrir
+    }
+    
+    //Criando metodo auxiliar para carregar os pets do usuario doador no comboboc
+    private void carregarTabela() {
+        //Definindo o modelo de tabela
+        DefaultTableModel modelo = (DefaultTableModel) tablePets.getModel();
+        modelo.setRowCount(0);
+        
+        //DAO para buscar no banco
+        InteresseDAO interesseDAO = new interesseDAO();
+        
+        //Busca todos as solicitacoes vinculadas ao usuario logado
+        ArrayList<Interesse> lista = interesseDAO.listarInteressesPorPet(usuarioLogado.getIdUsuario());
+        
+        //Buscando os pets no banco de dados
+        PetDAO dao = new PetDAO();
+        ArrayList<Pet> pets = dao.listarPets();
+        
+        //Filtrando apenas os pets do usuario logado que estao disponiveis
+        for (Pet pet : pets) {
+            if (pet.getIdUsuarioDono() == usuarioLogado.getIdUsuario()) {
+                cbPets.addItem(pet);
+            }
+        }
+        
+        if (cbPets.getItemCount() == 0) {
+            JOptionPane.showMessageDialog(this,
+                "Você não tem pets cadastrados ainda! ",
+                "Aviso",
+                JOptionPane. INFORMATION_MESSAGE);
+        } else {
+            //Carrega as solicitacoes do primeiro pet
+            carregarSolicitacoes();
+        }
+    }
+
+    //Criando um metodo para carregar as solicitacoes  
+    public void carregarSolicitacoes(){
+        Pet petSelecionado = (Pet) cbPets.getSelectedItem();
+        
+        if (petSelecionado == null) {
+            return;
+        }
+        
+        //Buscando as solicitacoes no banco de dados
+        InteresseDAO dao = new InteresseDAO();
+        
+        try {
+            ArrayList<Interesse> interesses = dao.listarInteressesPorPet(petSelecionado.getIdPet());
+            
+            //Configurando o modelo da tabela
+            DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+            modelo.setRowCount(0); //Limpando a tabela
+            
+            //Incluindo as solicitacoes dinamicamente na tabela
+            for (Interesse interesse : interesses) {
+                modelo.addRow(new Object[]{
+                    interesse.getIdUsuario(),
+                    interesse.getUsuario().getNomeUsuario(),
+                    interesse.getDataInteresse(),
+                    "Pendente"
+                });
+            }
+            
+            if (interesses.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "Não há solicitações para este pet.",
+                    "Informação",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+        } catch (SQLException ex) {
+            JOptionPane. showMessageDialog(this,
+                "Erro ao carregar solicitações: " + ex.getMessage(),
+                "Erro",
+                JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -27,19 +124,17 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jlSolicitacoesPet = new javax.swing.JLabel();
+        cbPets = new javax.swing.JComboBox<>();
+        tablePets = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnAprovarSolicitacao = new javax.swing.JButton();
+        btnRecusarSolicitacao = new javax.swing.JButton();
 
         setClosable(true);
         setTitle("Gerenciar Solicitações");
 
-        jLabel1.setText("Selecione um dos seus Pets para ver as solicitações:");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jlSolicitacoesPet.setText("Selecione um dos seus Pets para ver as solicitações:");
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -49,22 +144,22 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "ID Solicitação", "Nome do Adotante", "Data", "Status"
+                "ID do usuário", "Nome do Adotante", "Data", "Status"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        tablePets.setViewportView(jTable1);
 
-        jButton1.setText("Aprovar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnAprovarSolicitacao.setText("Aprovar");
+        btnAprovarSolicitacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnAprovarSolicitacaoActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Recusar");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnRecusarSolicitacao.setText("Recusar");
+        btnRecusarSolicitacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnRecusarSolicitacaoActionPerformed(evt);
             }
         });
 
@@ -76,36 +171,36 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cbPets, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel1)
+                                        .addComponent(jlSolicitacoesPet)
                                         .addGap(0, 0, Short.MAX_VALUE))
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                         .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(jButton1)))
+                                        .addComponent(btnAprovarSolicitacao)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton2))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(btnRecusarSolicitacao))
+                            .addComponent(tablePets, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(50, 50, 50)
-                .addComponent(jLabel1)
+                .addComponent(jlSolicitacoesPet)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbPets, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tablePets, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(btnAprovarSolicitacao)
+                    .addComponent(btnRecusarSolicitacao))
                 .addContainerGap(50, Short.MAX_VALUE))
         );
 
@@ -123,22 +218,102 @@ public class GerenciarSolicitacoes extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnAprovarSolicitacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAprovarSolicitacaoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+        //Verificando se o usuario selecionou alguma linha da tabela
+        int linhaSelecionada = jTable1.getSelectedRow();
+        
+        //Usando if para verificar se nao tem nenhuma linha selecionada, se nao tiver vai lancar uma mensagem
+        if (linhaSelecionada == -1) {
+            JOptionPane.showMessageDialog(this,
+                "Por favor, selecione uma solicitação para aprovar!",
+                "Atenção",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        //Pegando os dados da linha selecionada
+        int idUsuarioAdotante = (int) jTable1.getValueAt(linhaSelecionada, 0);
+        Pet petSelecionado = (Pet) cbPets.getSelectedItem();
+        
+        try {
+            //Aprovando a adocao usando o AdocaoDAO
+            AdocaoDAO dao = new AdocaoDAO();
+            
+            if (dao.aprovarAdocao(petSelecionado.getIdPet(), idUsuarioAdotante)) {
+                //Se der certo, vai mostrar mensagem de sucesso
+                JOptionPane.showMessageDialog(this,
+                    "Adoção aprovada com sucesso!",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                
+                //Recarregando a lista de pets
+                cbPets.removeAllItems();
+                carregarPets();
+            } else {
+                //Se der erro, mostra mensagem de erro
+                JOptionPane.showMessageDialog(this,
+                    "Erro ao aprovar adoção.  Tente novamente.",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                "Erro ao aprovar adoção: " + ex.getMessage(),
+                "Erro",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnAprovarSolicitacaoActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnRecusarSolicitacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecusarSolicitacaoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+        //Verificando se o usuario selecionou alguma linha da tabela
+        int linhaSelecionada = jTable1.getSelectedRow();
+        
+        //Usando if para verificar se nao tem nenhuma linha selecionada, se nao tiver vai lancar uma mensagem
+        if (linhaSelecionada == -1) {
+            JOptionPane.showMessageDialog(this,
+                "Por favor, selecione uma solicitação para recusar!",
+                "Atenção",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        //Pegando os dados da linha selecionada
+        int idUsuario = (int) jTable1.getValueAt(linhaSelecionada, 0);
+        Pet petSelecionado = (Pet) cbPets.getSelectedItem();
+        
+        //Recusando a solicitacao usando o InteresseDAO
+        InteresseDAO dao = new InteresseDAO();
+        
+        if (dao.removerInteresse(petSelecionado. getIdPet(), idUsuario)) {
+            //Se der certo, vai mostrar mensagem de sucesso
+            JOptionPane. showMessageDialog(this,
+                "Solicitação recusada com sucesso! ",
+                "Sucesso",
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            //Recarregando as solicitacoes
+            carregarSolicitacoes();
+        } else {
+            //Se der erro, mostra mensagem de erro
+            JOptionPane.showMessageDialog(this,
+                "Erro ao recusar solicitação. Tente novamente.",
+                "Erro",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRecusarSolicitacaoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton btnAprovarSolicitacao;
+    private javax.swing.JButton btnRecusarSolicitacao;
+    private javax.swing.JComboBox<Pet> cbPets;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JLabel jlSolicitacoesPet;
+    private javax.swing.JScrollPane tablePets;
     // End of variables declaration//GEN-END:variables
 }
+ç

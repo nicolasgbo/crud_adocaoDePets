@@ -43,7 +43,7 @@ public class CadastroPet extends javax.swing.JInternalFrame {
         cbEspeciePet.removeAllItems();
 
         //Buscando as especies disponiveis no Banco de dados usando o EspecieDAO
-        EspecieDAO dao = new EspecieDAO();  // ← MUDANÇA AQUI
+        EspecieDAO dao = new EspecieDAO(); 
         ArrayList<Especie> especies = dao.listarEspecies();
 
         // Adiciona as espécies no ComboBox

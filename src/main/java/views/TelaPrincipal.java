@@ -26,10 +26,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
         initComponents();
         this.usuarioLogado = usuario;
         
-        // Opcional: mostrar info do usuário
+        //Dando boas vindas ao usuario
         this.setTitle("Sistema de Adoção - Olá, " + usuario.getNomeUsuario());
         
-        // Diferenciar por tipo
+        //Diferenciando os usuario por tipo. adotante ou doador
         if ("doador".equals(usuario.getTipoUsuario())) {
             System.out. println("Usuário logado como DOADOR");
         } else if ("adotante".equals(usuario.getTipoUsuario())) {
@@ -37,7 +37,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
     }
     
-    // Método para acessar o usuário em outras partes
+    //Metodo para acessar o usuario em outras partes do codigo
     public Usuario getUsuarioLogado() {
         return usuarioLogado;
     }
@@ -215,7 +215,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
             public void run() {
                 Login telaLogin = new Login();
                 telaLogin.setVisible(true);
-                telaLogin. setLocationRelativeTo(null); // Centraliza na tela
+                telaLogin. setLocationRelativeTo(null); //Centraliza na tela
             }
         });
     }

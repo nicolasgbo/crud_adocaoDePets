@@ -9,7 +9,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import model.bean.Interesse;
+import model.bean.Usuario;
 
 /**
  *
@@ -47,7 +49,7 @@ public class InteresseDAO {
             //Retornado false caso de errado 
             return false;
         } finally {
-            //Independentemente do resultado ele vai fechar as conexoes
+            //Independentemente do r    esultado ele vai fechar as conexoes
             Conexao.fecharConexao(con, stmt, rs);
         }
     }
@@ -117,5 +119,48 @@ public class InteresseDAO {
             //Independente dos resultados, vai fechar as conexoes
             Conexao.fecharConexao(con, stmt);
         }
+    }
+    
+    //READ - Listar todos os interesses de um pet especifico com os dados do usuario
+    public ArrayList<Interesse> listarInteressesPorPet(int idPet) throws SQLException {
+        //Criando a conexao e a preparacao com a query
+        Connection con = Conexao.getConexao();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<Interesse> interesses = new ArrayList<>();
+
+        try {
+            //Criando a query que vai buscar os interesses do pet com o nome do usuario
+            String sql = "SELECT i.idPet, i.idUsuario, i.dataInteresse, u.nome " +
+                         "FROM Interesse i " +
+                         "INNER JOIN Usuario u ON i.idUsuario = u.idUsuario " +
+                         "WHERE i. idPet = ? " +
+                         "ORDER BY i.dataInteresse DESC";
+            
+            //Preparando e executando a query
+            stmt = con. prepareStatement(sql);
+            stmt.setInt(1, idPet);
+            rs = stmt.executeQuery();
+
+            //Percorrendo os resultados exibidos
+            while (rs. next()) {
+                Interesse interesse = new Interesse();
+                interesse.setIdPet(rs.getInt("idPet"));
+                interesse.setIdUsuario(rs.getInt("idUsuario"));
+                interesse.setDataInteresse(rs.getDate("dataInteresse"). toLocalDate());
+
+                //Criando objeto Usuario com o nome
+                Usuario usuario = new Usuario();
+                usuario.setIdUsuario(rs.getInt("idUsuario"));
+                usuario. setNomeUsuario(rs.getString("nome"));
+                interesse.setUsuario(usuario);
+
+                interesses.add(interesse);
+            }
+        } finally {
+            Conexao.fecharConexao(con, stmt, rs);
+        }
+
+        return interesses;
     }
 }
